@@ -9,8 +9,16 @@
 - it should be easy to use
 
 
+##wanted packages
+- cors
+- jwt
+- express
+- bycrypt
+
+
 ##login flow plan
 -the login should be place in below routes
+
 1.api/auth/register
 
 2.api/auth/login
