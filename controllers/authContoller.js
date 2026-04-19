@@ -39,14 +39,51 @@ const signup = async (req, res) => {
     if (error.code === 11000 && error.keyPattern && error.keyPattern.email) {
       return res.status(409).json({
         success: false,
-        message:
-          "This email is already registered to another store owner or staff member.",
+        message: "This email is already registered to another user.",
       });
     }
     res.status(500).json({ success: false, message: "Something went wrong" });
   }
 };
 
+const signin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
+    }
+
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
+    }
+
+    const token = user.makeJWT();
+
+    res.cookie("token", token);
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged in successfully!",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong!",
+    });
+  }
+};
+
 module.exports = {
   signup,
+  signin,
 };
