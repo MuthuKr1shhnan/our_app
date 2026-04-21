@@ -24,3 +24,8 @@
 2.api/auth/login
 
 3.api/auth/logout
+
+
+-start of the main flow of ourApp
+
+1.api/user/profile ==== Return the currently logged-in user’s safe, usable data.

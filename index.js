@@ -4,18 +4,22 @@ const app = express();
 
 const cors = require("cors");
 
-const cookieParser = require("cookie-parser")
+const cookieParser = require("cookie-parser");
 
-app.use(cookieParser())
+const { connectDB } = require("../backend_practice/config/database");
+
+const authRoutes = require("./routes/authRoutes");
+
+const { isAuthenticated } = require("./middlewares/authMiddleware");
+
+const userRoutes  = require("./routes/userRoutes");
+
+app.use(cookieParser());
 
 app.use(express.json());
 
 app.use(cors());
 
-const { connectDB } = require("../backend_practice/config/database");
-const authRoutes = require("./routes/authRoutes");
-
-connectDB();
 
 app.get("/", (req, res) => {
   res.send("Hello World...");
@@ -23,6 +27,15 @@ app.get("/", (req, res) => {
 
 //auth
 app.use("/api/auth", authRoutes);
+
+//profile
+app.use("/api/user", isAuthenticated, userRoutes);
+
+connectDB()
+  .then(() => console.log("DB Connected successfully!"))
+  .catch((err) => {
+    console.err(err.message);
+  });
 
 const port = 7777;
 

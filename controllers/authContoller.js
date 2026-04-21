@@ -69,6 +69,8 @@ const signin = async (req, res) => {
 
     const token = user.makeJWT();
 
+    console.log(token, "Token")
+
     res.cookie("token", token);
 
     return res.status(200).json({
@@ -83,7 +85,26 @@ const signin = async (req, res) => {
   }
 };
 
+const signout = (req, res) => {
+  try {
+    res.cookie("token", "", {
+      expires: new Date(0),
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
 module.exports = {
   signup,
   signin,
+  signout,
 };

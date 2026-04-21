@@ -1,8 +1,11 @@
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const { User } = require("../models/User");
 
 const validateSignUpData = async (req, res, next) => {
   try {
-    const { firstName, lastName, age, email, address, password, phone } = req.body;
+    const { firstName, lastName, age, email, address, password, phone } =
+      req.body;
 
     if (!firstName || !lastName) {
       throw new Error("Name is not valid!");
@@ -10,8 +13,8 @@ const validateSignUpData = async (req, res, next) => {
       throw new Error("Invalid Email!");
     } else if (!validator.isStrongPassword(password)) {
       throw new Error("Password is not Strong enough!");
-    }else if(!validator.isMobilePhone(phone, 'any')){
-      throw new Error("Phone number is not valid!")
+    } else if (!validator.isMobilePhone(phone, "any")) {
+      throw new Error("Phone number is not valid!");
     }
 
     next();
@@ -23,6 +26,29 @@ const validateSignUpData = async (req, res, next) => {
   }
 };
 
+const isAuthenticated = async (req, res, next) => {
+  try {
+    const { token } = req.cookies;
 
+    if (!token) {
+      res.status(401).json({
+        success: false,
+        message: "Autherization error!",
+      });
+      return;
+    }
 
-module.exports = { validateSignUpData };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const { id } = decoded;
+
+    const user = await User.findById({ _id: id });
+
+    req.user = user;
+
+    next();
+  } catch (error) {
+    console.error("Error in isAuthenticated middleware: ", error.message);
+  }
+};
+
+module.exports = { validateSignUpData, isAuthenticated };

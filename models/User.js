@@ -73,10 +73,14 @@ const userSchema = new Schema({
   },
 });
 
-userSchema.methods.makeJWT = async function () {
+userSchema.methods.makeJWT = function () {
   const user = this;
-  const token = await jwt.sign({id:user._id}, process.env.JWT_SECRET);
-  return token
+
+  console.log(user, "userData");
+
+  const token = jwt.sign({ id: user._id.toString() }, process.env.JWT_SECRET);
+
+  return token;
 };
 
 const User = mongoose.model("User", userSchema);
